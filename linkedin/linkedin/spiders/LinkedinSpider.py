@@ -15,7 +15,7 @@ from linkedin.db import MongoDBClient
 class LinkedinspiderSpider(CrawlSpider):
     name = 'LinkedinSpider'
     allowed_domains = ['linkedin.com']
-    start_urls = [ "http://www.linkedin.com/directory/people/%s.html" % s 
+    start_urls = [ "http://www.linkedin.com/directory/people-%s" % s
                    for s in "abcdefghijklmnopqrstuvwxyz" ]
 
     rules = (
@@ -32,6 +32,8 @@ class LinkedinspiderSpider(CrawlSpider):
         response = response.replace(url=HtmlParser.remove_url_parameter(response.url))
         hxs = HtmlXPathSelector(response)
         index_level = self.determine_level(response)
+        log.msg("Index level %d " % (index_level),
+            level=log.DEBUG, spider=self)
         if index_level in [1, 2, 3, 4]:
             self.save_to_file_system(index_level, response)
             relative_urls = self.get_follow_links(index_level, hxs)
@@ -45,6 +47,8 @@ class LinkedinspiderSpider(CrawlSpider):
             if linkedin_id:
                 personProfile['_id'] = linkedin_id
                 personProfile['url'] = UnicodeDammit(response.url).markup
+                log.msg("Item PersonProfile %r" % (personProfile),
+                    level=log.DEBUG, spider=self)
                 yield personProfile
     
     def determine_level(self, response):
@@ -58,11 +62,11 @@ class LinkedinspiderSpider(CrawlSpider):
         """
         import re
         url = response.url
-        if re.match(".+/[a-z]\.html", url):
+        if re.match(".+/[a-z]\d", url):
             return 1
-        elif re.match(".+/[A-Z]\d+.html", url):
+        elif re.match(".+/[A-Z]\d", url):
             return 2
-        elif re.match(".+/people/[a-zA-Z0-9-]+.html", url):
+        elif re.match(".+/directory/[a-zA-Z0-9-]", url):
             return 3
         elif re.match(".+/pub/dir/.+", url):
             return 4
@@ -109,11 +113,11 @@ class LinkedinspiderSpider(CrawlSpider):
     def get_follow_links(self, level, hxs):
         if level in [1, 2, 3]:
             relative_urls = hxs.select("//ul[@class='directory']/li/a/@href").extract()
-            relative_urls = ["http://linkedin.com" + x for x in relative_urls]
+            relative_urls = ["http://www.linkedin.com" + x for x in relative_urls]
             return relative_urls
         elif level == 4:
             relative_urls = relative_urls = hxs.select("//ol[@id='result-set']/li/h2/strong/a/@href").extract()
-            relative_urls = ["http://linkedin.com" + x for x in relative_urls]
+            relative_urls = ["http://www.linkedin.com" + x for x in relative_urls]
             return relative_urls
 
     def create_path_if_not_exist(self, filePath):
