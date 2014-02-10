@@ -32,8 +32,6 @@ class LinkedinspiderSpider(CrawlSpider):
         response = response.replace(url=HtmlParser.remove_url_parameter(response.url))
         hxs = HtmlXPathSelector(response)
         index_level = self.determine_level(response)
-        log.msg("Index level %d " % (index_level),
-            level=log.DEBUG, spider=self)
         if index_level in [1, 2, 3, 4]:
             self.save_to_file_system(index_level, response)
             relative_urls = self.get_follow_links(index_level, hxs)
@@ -47,8 +45,6 @@ class LinkedinspiderSpider(CrawlSpider):
             if linkedin_id:
                 personProfile['_id'] = linkedin_id
                 personProfile['url'] = UnicodeDammit(response.url).markup
-                log.msg("Item PersonProfile %r" % (personProfile),
-                    level=log.DEBUG, spider=self)
                 yield personProfile
     
     def determine_level(self, response):
