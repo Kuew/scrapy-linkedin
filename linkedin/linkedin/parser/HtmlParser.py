@@ -51,11 +51,11 @@ class HtmlParser:
         if summary and len(summary) > 0:
             personProfile['summary'] = ''.join(x.strip() for x in summary)
         
-        ## specilities
-        specilities = hxs.select("//div[@id='profile-specialties']/p/text()").extract()
-        if specilities and len(specilities) == 1:
-            specilities = specilities[0].strip()
-            personProfile['specilities'] = specilities
+        ## specialties
+        specialties = hxs.select("//div[@id='profile-specialties']/p/text()").extract()
+        if specialties and len(specialties) == 1:
+            specialties = specialties[0].strip()
+            personProfile['specialties'] = specialties
         
         ## skills
         skills = hxs.select("//ol[@id='skills-list']/li/span/a/text()").extract()

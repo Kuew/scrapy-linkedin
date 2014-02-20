@@ -20,7 +20,7 @@ class PersonProfileItem(Item):
     locality = Field()
     industry = Field()
     summary = Field()
-    specilities = Field()
+    specialties = Field()
     skills = Field()
     interests = Field()
     group = Field()
