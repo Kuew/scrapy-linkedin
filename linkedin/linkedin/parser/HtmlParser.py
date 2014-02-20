@@ -58,7 +58,7 @@ class HtmlParser:
             personProfile['specialties'] = specialties
         
         ## skills
-        skills = hxs.select("//ol[@id='skills-list']/li/span/a/text()").extract()
+        skills = hxs.select("//ol[@id='skills-list']/li/span/text()").extract()
         if skills and len(skills) > 0:
             personProfile['skills'] = [x.strip() for x in skills]
             
